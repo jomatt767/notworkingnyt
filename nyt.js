@@ -6,7 +6,7 @@ let url; //3
 const searchTerm = document.querySelector(".search");
 const startDate = document.querySelector(".start-date");
 const endDate = document.querySelector(".end-date");
-const seachForm = document.querySelector("form");
+const searchForm = document.querySelector("form");
 const submitBtn = document.querySelector(".submit");
 
 //results navigation
@@ -19,12 +19,12 @@ const section = document.querySelector("section");
 
 nav.style.display = "none";
 let pageNumber = 0;
-console.log("pageNumber:", pageNumber);
+//console.log("pageNumber:", pageNumber);
 let displayNav = false;
 
            //1                     //2
-searchForm.addEventListener("submit" , fetchResults);
-nextBtn.addEventsListener("click" , nextpage);
+searchForm.addEventListener('submit', fetchResults);
+nextBtn.addEventListener("click" , nextPage);
 previousBtn.addEventListener("click" , previousPage); //3
 
 function fetchResults(e) {
@@ -34,55 +34,31 @@ function fetchResults(e) {
     url = baseURL + "?api-key=" + key + "&page=" + pageNumber + "&q=" + searchTerm.Value; //3
     console.log("URL:",url);
 
+    if (startDate.value !== "") {
+        console.log(startDate.value);
+        url += "&begin_date=" + startDate.value;
+    };
+    if (endDate.value !== "") {
+        url += "&end_date=" + endDate.value;
+    };
+    fetch(url)
+        .then(function (results) {
+            console.log(results);
+            return results.json();
+        }).then(function (json) {
+            console.log(json);
+            displayResults(json);
+        });
+    
 };
-function nextpage() {
-    console.log("Next button clicked");
-}//5
-function previousPage() {
-    console.log("Next button clicked");
-}//5
 
-if (startDate.value !== "") {
-    console.log(startDate.value);
-    url += "&begin_date=" + startDate.value;
-};
-if (endDate.value !== "") {
-    url += "&end_date=" + endDate.value;
-fetch(url)
-    .then(function (results) {
-        console.log(results);
-        return results.json();
-    }).then(function (json) {
-        
-    });
-}
-{function displayResults(json){
+
+function displayResults(json){
     while (section.firstChild){
         section.removeChild(section.firstChild);
     }
     let articles=json.response.docs;
-
-    if(articles.length >= 10) {
-        nav.style.display = "block";
-    } else {
-        nav.style.display = "none";
-    }
-    };
-    function nextPage(e) {
-        pageNumber++;
-        fetchResults(e);
-        console.log("page number:",pegeNumber);
-    };
-    function prevoiusPage(e) {
-        if(pageNumber > 0) {
-            pageNumber--;
-        } else {
-            return;
-        }
-        fetchResults(e);
-        console.log("page:",pageNumber);
-    };
-    
+ 
     if(articles.length ===0) {
         console.log("No results");
     } else {
@@ -102,7 +78,7 @@ fetch(url)
 
             para.texContent = "Keywords:";
 
-            for(let j = 0; j < current.keywirds.length; j++) {
+            for(let j = 0; j < current.keywords.length; j++) {
                  
                 let span = document.createElement("span");
 
@@ -118,9 +94,6 @@ fetch(url)
             }
 
             clearfix.setAttribute("class","clearfix");
-
-
-
             article.appendChild(heading);//3
             heading.appendChild(link);
             article.appendChild(img);
@@ -129,8 +102,28 @@ fetch(url)
             section.appendChild(article);//4
         }
     }
+    if(articles.length >= 10) {
+        nav.style.display = "block";
+    } else {
+        nav.style.display = "none";
+    }
+    
 };
 
-    
+function nextPage(e) {
+    pageNumber++;
+    fetchResults(e);
+    console.log("page number:",pegeNumber);
+};//5
+
+function previousPage(e) {
+    if(pageNumber > 0) {
+        pageNumber--;
+    } else {
+        return;
+    }
+    fetchResults(e);
+    console.log("page:",pageNumber);
+};//5    
 
 
